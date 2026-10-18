@@ -2,7 +2,7 @@
 
 A personalized tech newspaper. Tell it what you do, and it prints up to five real stories that matter for your role.
 
-![Loopy's front page with a Product Designer story](docs/screenshot.png)
+![Loopy's front page with a Product Designer story](docs/screenshot.jpg)
 
 **Live:** https://manya-5.github.io/loopy/ (a demo edition that replays a saved briefing of real articles; the live agent runs on Google Cloud)
 
