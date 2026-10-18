@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">LOOPY | The Daily Tech Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Oswald:wght@500;600;700&family=Playfair+Display:ital,wght@0,900;1,700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-paper: #faf6ec;
+    --paper-line: #e4ded0;
+    --ink: #111111;
+    --ink-faded: #4d4d4d;
+    --stamp-red: #b3261e;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background-color: var(--bg-paper);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    min-height: 100vh;
+    padding: 1.5rem 1rem 3.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Paper Texture Layer:
+     Desaturated, brightened, and lowered opacity for a subtle, natural, non-yellow paper texture */
+  .paper-texture-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url('aged_paper_texture.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    mix-blend-mode: multiply;
+    opacity: 0.18;
+    filter: grayscale(0.55) brightness(1.22) contrast(1.04);
+  }
+
+  .broadsheet {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Masthead */
+  .masthead {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(3.2rem, 12vw, 5.8rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 0.92;
+    margin-bottom: 0.35rem;
+  }
+
+  .personalized-paper-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(1.1rem, 3.8vw, 1.55rem);
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    min-height: 1.8rem;
+  }
+
+  .tagline {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faded);
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  /* Date line: EXACTLY THREE EQUAL-WIDTH COLUMNS */
+  .dateline-wrapper {
+    width: 100%;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    padding: 0.45rem 0;
+    margin-bottom: 1.4rem;
+  }
+  .dateline {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    font-family: 'Newsreader', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    font-weight: 600;
+    white-space: nowrap;
+    width: 100%;
+  }
+  .dateline-left {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dateline-center {
+    text-align: center;
+  }
+  .dateline-right {
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Role Chips */
+  .section-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    color: var(--ink-faded);
+  }
+  .role-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+  }
+  .role-btn {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.6rem 0.3rem;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .role-btn:hover, .role-btn.active {
+    background: var(--ink);
+    color: var(--bg-paper);
+  }
+  .role-btn:focus-visible, .role-btn:focus {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  .role-form {
+    width: 100%;
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+  .role-input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--ink);
+    padding: 0.55rem 0.8rem;
+    font-family: 'Newsreader', serif;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--ink);
+    outline: none;
+  }
+  .role-input:focus {
+    outline: 2px solid var(--ink);
+  }
+  .role-input::placeholder {
+    color: #777;
+    font-style: italic;
+  }
+  .role-submit {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 1.1rem;
+    cursor: pointer;
+    outline: none;
+  }
+  .role-submit:hover {
+    background: var(--ink);
+    color: var(--bg-paper);
+  }
+  .role-submit:focus-visible {
+    outline: 2px solid var(--ink);
+  }
+
+  /* Typewriter Loading Line */
+  .typewriter-loader-stage {
+    width: 100%;
+    min-height: 2.2rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin: 1.2rem 0;
+    border-top: 1px dashed var(--ink-faded);
+    border-bottom: 1px dashed var(--ink-faded);
+    padding: 0.4rem 0;
+  }
+  .typewriter-loader-line {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.88rem;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    text-transform: uppercase;
+    white-space: pre;
+    display: inline-block;
+  }
+  .typewriter-loader-cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: 1.1em;
+    background: var(--ink);
+    vertical-align: sub;
+    margin-left: 2px;
+    animation: blinkCursor 0.5s infinite;
+  }
+  @keyframes blinkCursor {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  /* Deck Stage & Fast Paper Flip */
+  .deck-stage {
+    width: 100%;
+    position: relative;
+    margin-top: 0.8rem;
+    min-height: 480px;
+    display: none;
+  }
+
+  .story-sheet {
+    width: 100%;
+    background-color: var(--bg-paper);
+    padding: 2rem 1.2rem 1.6rem 1.2rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-left: 1px solid var(--paper-line);
+    border-right: 1px solid var(--paper-line);
+    border-bottom: 2px solid var(--ink);
+    border-top: 1.5px solid var(--ink);
+    will-change: transform, opacity;
+  }
+
+  .sheet-underneath {
+    z-index: 1;
+    pointer-events: none;
+  }
+  .sheet-current {
+    z-index: 2;
+  }
+
+  .sheet-peel-away {
+    animation: fastPeelNext 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes fastPeelNext {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(-115%, -18px, 0) rotate(-4deg);
+      opacity: 0;
+    }
+  }
+
+  .sheet-settle-prev {
+    animation: fastSettlePrev 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes fastSettlePrev {
+    0% {
+      transform: translate3d(-115%, -18px, 0) rotate(-4deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  /* Headline & text ink-in */
+  .story-headline-wrap {
+    min-height: 3.8rem;
+    margin-bottom: 0.8rem;
+    width: 100%;
+    max-width: 620px;
+  }
+  .story-headline {
+    font-family: 'Anton', 'Oswald', sans-serif;
+    font-size: clamp(2.2rem, 7.5vw, 3.8rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+  .story-headline.inked {
+    opacity: 1;
+  }
+
+  .fade-in-element {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+  .fade-in-element.revealed {
+    opacity: 1;
+  }
+
+  /* Rubber Stamp */
+  .rubber-stamp {
+    position: absolute;
+    top: 1.2rem;
+    right: 0.8rem;
+    display: none;
+    pointer-events: none;
+    z-index: 5;
+    transform: rotate(11deg);
+  }
+  .rubber-stamp.stamped {
+    display: inline-block;
+    animation: stampSlam 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes stampSlam {
+    0% { opacity: 0; transform: scale(2.8) rotate(24deg); }
+    100% { opacity: 0.88; transform: scale(1) rotate(11deg); }
+  }
+
+  .stamp-box {
+    border: 3.5px double var(--stamp-red);
+    padding: 0.35rem 0.75rem;
+    color: var(--stamp-red);
+    font-family: 'Oswald', 'Anton', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow: 0 0 0.5px rgba(179, 38, 30, 0.6);
+  }
+
+  .story-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+  }
+  .story-badge {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid var(--ink);
+    padding: 0.15rem 0.55rem;
+  }
+  .story-counter {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--ink-faded);
+  }
+
+  .story-byline {
+    font-family: 'Newsreader', serif;
+    font-size: 0.88rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    margin-bottom: 1.2rem;
+  }
+  .story-byline span {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .ornament {
+    width: 65px;
+    height: 1.5px;
+    background: var(--ink);
+    margin-bottom: 1.3rem;
+  }
+
+  .story-why {
+    font-family: 'Newsreader', Georgia, serif;
+    font-style: italic;
+    font-size: 1.22rem;
+    line-height: 1.55;
+    color: var(--ink);
+    max-width: 580px;
+    margin-bottom: 1.6rem;
+  }
+
+  .story-link-wrap {
+    margin-bottom: 1.8rem;
+  }
+  .story-link {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+    transition: opacity 0.15s ease;
+  }
+  .story-link:hover {
+    opacity: 0.7;
+  }
+
+  .story-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 0.55rem 0;
+    margin-top: 0.8rem;
+  }
+  .nav-btn {
+    background: transparent;
+    border: none;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.84rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0.2rem 0.6rem;
+    outline: none;
+  }
+  .nav-btn:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+  .nav-btn:focus-visible {
+    outline: 1.5px solid var(--ink);
+  }
+  .nav-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 640px) {
+    .dateline {
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+    }
+  }
+  @media (max-width: 480px) {
+    .role-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.35rem;
+    }
+    .role-btn {
+      font-size: 0.72rem;
+      padding: 0.45rem 0.2rem;
+    }
+    .story-why {
+      font-size: 1.1rem;
+    }
+    .rubber-stamp {
+      top: 0.5rem;
+      right: 0.4rem;
+    }
+    .stamp-box {
+      font-size: 0.95rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Paper Texture Overlay: Subtle, desaturated, lighter natural paper tone -->
+<div class="paper-texture-layer"></div>
+
+<main class="broadsheet">
+  <!-- Masthead -->
+  <h1 class="masthead">LOOPY</h1>
+  <div id="paper-name" class="personalized-paper-name">The Daily Tech Dispatch</div>
+  <div class="tagline">The Personalized Broadsheet for Modern Builders</div>
+
+  <!-- Date line: 3 EQUAL-WIDTH COLUMNS, date exactly centered -->
+  <div class="dateline-wrapper">
+    <div class="dateline">
+      <div class="dateline-left">EST. 2026</div>
+      <div class="dateline-center" id="dateline-today"></div>
+      <div class="dateline-right" id="dateline-edition">EDITION: GENERAL</div>
+    </div>
+  </div>
+
+  <!-- Role Chips -->
+  <div class="section-label">Select Your Calling</div>
+  <div class="role-grid">
+    <button class="role-btn" data-role="Product Designer">Product Designer</button>
+    <button class="role-btn" data-role="Design Engineer">Design Engineer</button>
+    <button class="role-btn" data-role="PM">PM</button>
+    <button class="role-btn" data-role="Frontend">Frontend</button>
+    <button class="role-btn" data-role="Backend">Backend</button>
+    <button class="role-btn" data-role="FDE">FDE</button>
+  </div>
+
+  <!-- Role Text Input -->
+  <form id="role-form" class="role-form">
+    <input id="role-input" class="role-input" type="text" placeholder="Or tell us what you do…" autocomplete="off" />
+    <button type="submit" class="role-submit">Dispatch</button>
+  </form>
+
+  <!-- Typewriter Loading Stage -->
+  <div id="typewriter-loader" class="typewriter-loader-stage">
+    <span id="loader-line" class="typewriter-loader-line"></span>
+    <span class="typewriter-loader-cursor"></span>
+  </div>
+
+  <!-- Deck Stage -->
+  <div id="deck-stage" class="deck-stage">
+    <!-- Underneath sheet (visible during peel-off) -->
+    <article id="sheet-underneath" class="story-sheet sheet-underneath" aria-hidden="true"></article>
+
+    <!-- Current active sheet -->
+    <article id="sheet-current" class="story-sheet sheet-current">
+      <div id="rubber-stamp" class="rubber-stamp">
+        <div id="stamp-text" class="stamp-box">EXTRA!</div>
+      </div>
+
+      <div class="story-meta-top fade-in-element">
+        <span id="story-badge" class="story-badge">News</span>
+        <span id="story-counter" class="story-counter">Story 1 of 5</span>
+      </div>
+
+      <div class="story-headline-wrap">
+        <h2 id="story-headline" class="story-headline"></h2>
+      </div>
+
+      <div id="story-byline" class="story-byline fade-in-element">
+        Reported by <span id="story-source">Source</span> &bull; <span id="story-date">Date</span>
+      </div>
+
+      <div class="ornament fade-in-element"></div>
+
+      <p id="story-why" class="story-why fade-in-element">Why it matters...</p>
+
+      <div class="story-link-wrap fade-in-element">
+        <a id="story-link" class="story-link" href="#" target="_blank" rel="noopener noreferrer">Read the full story &rarr;</a>
+      </div>
+
+      <div class="story-nav fade-in-element">
+        <button id="prev-btn" class="nav-btn">&larr; Previous</button>
+        <span id="nav-count" class="story-counter">Story 1 of 5</span>
+        <button id="next-btn" class="nav-btn">Next &rarr;</button>
+      </div>
+    </article>
+  </div>
+</main>
+
+<script>
+  window.LOOPY_DEMO = true;
+  function formatNewspaperDate(d) {
+    const days = ["SUN.", "MON.", "TUES.", "WED.", "THURS.", "FRI.", "SAT."];
+    const months = ["JAN.", "FEB.", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUG.", "SEPT.", "OCT.", "NOV.", "DEC."];
+    const dayName = days[d.getDay()];
+    const monthName = months[d.getMonth()];
+    const dateNum = d.getDate();
+    const year = d.getFullYear();
+    return `${dayName}, ${monthName} ${dateNum}, ${year}`;
+  }
+
+  function formatArticleDate(raw) {
+    if (!raw) return "RECENT";
+    const str = String(raw).trim();
+    if (str.toLowerCase() === "today") return "TODAY";
+
+    const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (isoMatch) {
+      const year = isoMatch[1];
+      const monthIdx = parseInt(isoMatch[2], 10) - 1;
+      const day = parseInt(isoMatch[3], 10);
+      const months = ["JAN.", "FEB.", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUG.", "SEPT.", "OCT.", "NOV.", "DEC."];
+      const mName = months[monthIdx] || "";
+      return `${mName} ${day}, ${year}`;
+    }
+    return str.toUpperCase();
+  }
+
+  const now = new Date();
+  document.getElementById("dateline-today").textContent = formatNewspaperDate(now);
+  const todayIso = now.toISOString().split('T')[0];
+
+  const pageTitleEl = document.getElementById("page-title");
+  const paperNameEl = document.getElementById("paper-name");
+  const editionEl = document.getElementById("dateline-edition");
+
+  const loaderStage = document.getElementById("typewriter-loader");
+  const loaderLineEl = document.getElementById("loader-line");
+
+  const deckStage = document.getElementById("deck-stage");
+  const sheetCurrent = document.getElementById("sheet-current");
+  const sheetUnderneath = document.getElementById("sheet-underneath");
+
+  const rubberStamp = document.getElementById("rubber-stamp");
+  const stampText = document.getElementById("stamp-text");
+
+  const badgeEl = document.getElementById("story-badge");
+  const counterEl = document.getElementById("story-counter");
+  const navCountEl = document.getElementById("nav-count");
+  const headlineEl = document.getElementById("story-headline");
+  const sourceEl = document.getElementById("story-source");
+  const dateEl = document.getElementById("story-date");
+  const whyEl = document.getElementById("story-why");
+  const linkEl = document.getElementById("story-link");
+
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  const roleButtons = document.querySelectorAll(".role-btn");
+  const roleForm = document.getElementById("role-form");
+  const roleInput = document.getElementById("role-input");
+
+  let stories = [];
+  let currentIndex = 0;
+  let isTransitioning = false;
+
+  let loaderInterval = null;
+  const loaderPhrases = [
+    "SETTING TYPE...",
+    "PULLING WIRES...",
+    "INKING THE PRESS...",
+    "COMPOSING DISPATCH...",
+    "PRINTING EDITION..."
+  ];
+
+  function startTypewriterLoader() {
+    loaderStage.style.display = "flex";
+    deckStage.style.display = "none";
+    let phraseIdx = 0;
+    let charIdx = 0;
+    loaderLineEl.textContent = "";
+
+    function typeNextChar() {
+      const phrase = loaderPhrases[phraseIdx];
+      if (charIdx < phrase.length) {
+        loaderLineEl.textContent += phrase.charAt(charIdx);
+        charIdx++;
+        loaderInterval = setTimeout(typeNextChar, 42);
+      } else {
+        loaderInterval = setTimeout(() => {
+          loaderLineEl.textContent = "";
+          charIdx = 0;
+          phraseIdx = (phraseIdx + 1) % loaderPhrases.length;
+          loaderInterval = setTimeout(typeNextChar, 180);
+        }, 850);
+      }
+    }
+    typeNextChar();
+  }
+
+  function stopTypewriterLoader() {
+    if (loaderInterval) clearTimeout(loaderInterval);
+    loaderStage.style.display = "none";
+  }
+
+  function generatePaperName(role) {
+    const r = role.trim();
+    const map = {
+      "Product Designer": "The Product Design Gazette",
+      "Design Engineer": "The Design Engineer Times",
+      "PM": "The Product Management Chronicle",
+      "Frontend": "The Frontend Examiner",
+      "Backend": "The Systems & Backend Tribune",
+      "FDE": "The Forward Deployed Herald"
+    };
+    if (map[r]) return map[r];
+
+    let clean = r.replace(/^(i'm an?|i am an?|working as an?)\s+/i, '').trim();
+    if (!clean) clean = "Craft";
+    clean = clean.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+    const suffixes = ["Gazette", "Chronicle", "Times", "Tribune", "Dispatch", "Observer", "Herald"];
+    let hash = 0;
+    for (let i = 0; i < clean.length; i++) hash = (hash << 5) - hash + clean.charCodeAt(i);
+    const suffix = suffixes[Math.abs(hash) % suffixes.length];
+
+    if (/times|gazette|chronicle|tribune|herald|journal|post/i.test(clean)) {
+      return `The ${clean}`;
+    }
+    return `The ${clean} ${suffix}`;
+  }
+
+  function updateMastheadForRole(role) {
+    const paperName = generatePaperName(role);
+    paperNameEl.textContent = paperName;
+    pageTitleEl.textContent = `${paperName} | LOOPY`;
+    editionEl.textContent = `EDITION: ${role.toUpperCase()}`;
+  }
+
+  roleButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      roleButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const role = btn.getAttribute("data-role");
+      sendRoleQuery(`I'm a ${role}`, role);
+    });
+  });
+
+  roleForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const val = roleInput.value.trim();
+    if (!val) return;
+    roleButtons.forEach(b => b.classList.remove("active"));
+    sendRoleQuery(val, val);
+    roleInput.value = "";
+  });
+
+  prevBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (currentIndex > 0 && !isTransitioning) {
+      turnPage("prev");
+    }
+  });
+
+  nextBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (currentIndex < stories.length - 1 && !isTransitioning) {
+      turnPage("next");
+    }
+  });
+
+  function turnPage(direction) {
+    isTransitioning = true;
+    const targetIdx = direction === "next" ? currentIndex + 1 : currentIndex - 1;
+    const targetStory = stories[targetIdx];
+
+    if (direction === "next") {
+      fillSheetHTML(sheetUnderneath, targetStory, targetIdx);
+      sheetUnderneath.style.display = "flex";
+
+      sheetCurrent.classList.add("sheet-peel-away");
+
+      setTimeout(() => {
+        sheetCurrent.classList.remove("sheet-peel-away");
+        sheetUnderneath.style.display = "none";
+        currentIndex = targetIdx;
+        printCurrentStory();
+        isTransitioning = false;
+      }, 440);
+
+    } else {
+      currentIndex = targetIdx;
+      sheetCurrent.classList.add("sheet-settle-prev");
+      printCurrentStory();
+
+      setTimeout(() => {
+        sheetCurrent.classList.remove("sheet-settle-prev");
+        isTransitioning = false;
+      }, 440);
+    }
+  }
+
+  function fillSheetHTML(container, story, idx) {
+    const isToday = story.rawDate && (story.rawDate === todayIso || story.rawDate.toLowerCase() === "today");
+    const stampMsg = isToday ? "HOT OFF THE PRESS" : (story.category && story.category.toLowerCase().includes("read") ? "WORTH A READ" : "EXTRA!");
+
+    container.innerHTML = `
+      <div class="rubber-stamp stamped" style="display:inline-block;">
+        <div class="stamp-box">${stampMsg}</div>
+      </div>
+      <div class="story-meta-top fade-in-element revealed">
+        <span class="story-badge">${story.category || "News"}</span>
+        <span class="story-counter">Story ${idx + 1} of ${stories.length}</span>
+      </div>
+      <div class="story-headline-wrap">
+        <h2 class="story-headline inked">${story.headline}</h2>
+      </div>
+      <div class="story-byline fade-in-element revealed">
+        Reported by <span>${story.source}</span> &bull; <span>${story.date}</span>
+      </div>
+      <div class="ornament fade-in-element revealed"></div>
+      <p class="story-why fade-in-element revealed">“${story.why}”</p>
+      <div class="story-link-wrap fade-in-element revealed">
+        <a class="story-link" href="${story.url}" target="_blank" rel="noopener noreferrer">Read the full story &rarr;</a>
+      </div>
+      <div class="story-nav fade-in-element revealed">
+        <button class="nav-btn" disabled>&larr; Previous</button>
+        <span class="story-counter">Story ${idx + 1} of ${stories.length}</span>
+        <button class="nav-btn" disabled>Next &rarr;</button>
+      </div>
+    `;
+  }
+
+
+  // Demo edition for the static GitHub Pages site. The live agent needs a
+  // Google Cloud backend, so the hosted page replays one saved briefing of
+  // real articles (real links and dates) instead of calling /chat.
+  const DEMO_STORIES = [
+    { category: "Design", headline: "A Practical Guide To Naming Things", source: "Smashing Magazine", rawDate: "2026-10-06",
+      why: "Naming is interface design. Useful next time you label a feature, a setting or a component.",
+      url: "https://smashingmagazine.com/2026/10/how-name-things/" },
+    { category: "AI", headline: "Is Your Organization Messing Up AI Adoption?", source: "Smashing Magazine", rawDate: "2026-10-16",
+      why: "Designers often end up owning how AI lands with people. A good gut check on rollout mistakes.",
+      url: "https://smashingmagazine.com/2026/10/is-your-organization-messing-up-ai-adoption/" },
+    { category: "AI", headline: "The next developer interface is ambient intelligence", source: "GitHub Blog", rawDate: "2026-10-15",
+      why: "Where tool makers think AI interfaces are heading, and what that asks of the people designing them.",
+      url: "https://github.blog/news-insights/company-news/the-next-developer-interface-is-ambient-intelligence/" },
+    { category: "Reads", headline: "From 2,500 requests to 24: Rebuilding star history without the stargazers", source: "GitHub Blog", rawDate: "2026-10-14",
+      why: "A clear story of making a feature fast by rethinking what the user actually needs to see.",
+      url: "https://github.blog/engineering/architecture-optimization/from-2500-requests-to-24-rebuilding-star-history-without-the-stargazers/" },
+    { category: "AI", headline: "Dots: Always-on agents", source: "Hacker News", rawDate: "2026-09-29",
+      why: "Agents that keep running in the background raise new questions about trust, status and control.",
+      url: "https://openai.com/index/introducing-dots/" }
+  ];
+
+  function runDemoEdition(roleLabel) {
+    setTimeout(() => {
+      stopTypewriterLoader();
+      if (roleLabel !== "Product Designer") {
+        loaderStage.style.display = "flex";
+        loaderLineEl.textContent = "DEMO PRINTS THE PRODUCT DESIGNER EDITION ONLY. RUN LOOPY LOCALLY FOR OTHER ROLES.";
+        return;
+      }
+      stories = DEMO_STORIES.map(s => ({ ...s, date: formatArticleDate(s.rawDate) }));
+      currentIndex = 0;
+      deckStage.style.display = "block";
+      sheetCurrent.style.display = "flex";
+      printCurrentStory();
+    }, 1800);
+  }
+
+  async function sendRoleQuery(queryText, roleLabel) {
+    updateMastheadForRole(roleLabel);
+    startTypewriterLoader();
+
+    if (window.LOOPY_DEMO) { runDemoEdition(roleLabel); return; }
+
+    try {
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: queryText, user_id: "newspaper_reader" })
+      });
+
+      const raw = await res.text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (err) {
+        throw new Error(`Server returned non-JSON response.`);
+      }
+
+      parseStories(data.parts || []);
+    } catch (err) {
+      stopTypewriterLoader();
+      loaderStage.style.display = "flex";
+      loaderLineEl.textContent = `PRESS MALFUNCTION: ${err.message.toUpperCase()}`;
+    }
+  }
+
+  function parseStories(parts) {
+    stories = [];
+    currentIndex = 0;
+
+    const a2uiParts = parts.filter(p => p && p.kind === "a2ui" && p.data);
+    if (a2uiParts.length > 0) {
+      extractStoriesFromA2UI(a2uiParts.map(p => p.data));
+    }
+
+    if (stories.length === 0) {
+      const textParts = parts.filter(p => p && (p.kind === "text" || p.text)).map(p => p.text || "");
+      const fullText = textParts.join("\n\n").trim();
+      if (fullText) {
+        extractStoriesFromText(fullText);
+      }
+    }
+
+    stopTypewriterLoader();
+
+    if (stories.length > 0) {
+      deckStage.style.display = "block";
+      sheetCurrent.style.display = "flex";
+      printCurrentStory();
+    } else {
+      loaderStage.style.display = "flex";
+      loaderLineEl.textContent = "NO STORIES COULD BE SET IN TYPE.";
+    }
+  }
+
+  function boundStr(v) {
+    if (v == null) return "";
+    if (typeof v === "string") return v;
+    if (typeof v.literalString === "string") return v.literalString;
+    return "";
+  }
+
+  function extractStoriesFromA2UI(messages) {
+    const comps = {};
+    for (const m of messages) {
+      const su = m.surfaceUpdate;
+      if (su && Array.isArray(su.components)) {
+        for (const c of su.components) {
+          if (c && c.id && c.component) comps[c.id] = c.component;
+        }
+      }
+    }
+
+    const cardIds = Object.keys(comps).filter(id => comps[id].Card);
+    let currentSection = "News";
+    let orderedKeys = cardIds;
+
+    for (const id in comps) {
+      if (comps[id].Column && comps[id].Column.children && Array.isArray(comps[id].Column.children.explicitList)) {
+        const list = comps[id].Column.children.explicitList;
+        const subCards = list.filter(cid => comps[cid] && comps[cid].Card);
+        if (subCards.length >= 2) {
+          orderedKeys = list;
+          break;
+        }
+      }
+    }
+
+    for (const id of orderedKeys) {
+      const comp = comps[id];
+      if (!comp) continue;
+
+      if (comp.Text) {
+        const txt = boundStr(comp.Text.text);
+        if (/read/i.test(txt)) currentSection = "Reads";
+        else if (/new/i.test(txt)) currentSection = "News";
+      }
+
+      if (!comp.Card) continue;
+
+      const cardProps = comp.Card;
+      const childId = cardProps.child;
+      const texts = [];
+
+      function collectText(cid) {
+        const node = comps[cid];
+        if (!node) return;
+        const type = Object.keys(node)[0];
+        const props = node[type] || {};
+
+        if (type === "Text") {
+          texts.push(boundStr(props.text));
+        }
+
+        if (props.child) collectText(props.child);
+        if (props.children && Array.isArray(props.children.explicitList)) {
+          props.children.explicitList.forEach(collectText);
+        }
+      }
+
+      if (childId) collectText(childId);
+
+      let headline = "";
+      let source = "Dispatches";
+      let rawDate = "";
+      let why = "";
+      let url = "#";
+
+      for (const t of texts) {
+        const trimmed = t.trim();
+        const linkMatch = trimmed.match(/\[(.*?)\]\((https?:\/\/[^\s)]+)\)/i) || trimmed.match(/(https?:\/\/[^\s]+)/i);
+        if (linkMatch) {
+          url = linkMatch[2] || linkMatch[1];
+        }
+
+        if (/why it matters/i.test(trimmed)) {
+          why = trimmed.replace(/^why it matters:?\s*/i, "");
+        } else if (/source:/i.test(trimmed) || /^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+          if (/source:/i.test(trimmed)) {
+            source = trimmed.replace(/^source:?\s*/i, "");
+          } else {
+            rawDate = trimmed;
+          }
+        } else if (!headline && trimmed.length > 5 && !linkMatch) {
+          headline = trimmed;
+        } else if (!why && trimmed.length > 25 && !linkMatch) {
+          why = trimmed;
+        }
+      }
+
+      if (headline) {
+        stories.push({
+          category: currentSection,
+          headline: headline,
+          source: source,
+          rawDate: rawDate,
+          date: formatArticleDate(rawDate),
+          why: why || "Selected as vital developments impacting your discipline.",
+          url: url
+        });
+      }
+    }
+  }
+
+  function extractStoriesFromText(text) {
+    const blocks = text.split(/\n\s*\n/);
+    let category = "News";
+    for (const b of blocks) {
+      if (/^#+\s*reads/i.test(b)) {
+        category = "Reads";
+        continue;
+      }
+      const lines = b.split("\n").map(l => l.trim()).filter(Boolean);
+      if (lines.length >= 2) {
+        const headline = lines[0].replace(/^#+\s*/, "").replace(/^\*+|\*+$/g, "");
+        let why = "";
+        let url = "#";
+        lines.forEach(l => {
+          const m = l.match(/https?:\/\/[^\s)]+/);
+          if (m) url = m[0];
+          if (/why/i.test(l)) why = l;
+        });
+        stories.push({
+          category: category,
+          headline: headline,
+          source: "Report",
+          rawDate: todayIso,
+          date: formatArticleDate(todayIso),
+          why: why || lines.slice(1).join(" "),
+          url: url
+        });
+      }
+    }
+  }
+
+  function printCurrentStory() {
+    if (!stories.length) return;
+    const s = stories[currentIndex];
+
+    rubberStamp.classList.remove("stamped");
+    rubberStamp.style.display = "none";
+
+    headlineEl.classList.remove("inked");
+    document.querySelectorAll(".fade-in-element").forEach(el => el.classList.remove("revealed"));
+
+    badgeEl.textContent = s.category || "News";
+    const countStr = `Story ${currentIndex + 1} of ${stories.length}`;
+    counterEl.textContent = countStr;
+    navCountEl.textContent = countStr;
+
+    headlineEl.textContent = s.headline;
+    sourceEl.textContent = s.source;
+    dateEl.textContent = s.date;
+    whyEl.textContent = `“${s.why}”`;
+
+    linkEl.href = s.url;
+    linkEl.style.display = (s.url && s.url !== "#") ? "inline-block" : "none";
+
+    prevBtn.disabled = (currentIndex === 0);
+    nextBtn.disabled = (currentIndex === stories.length - 1);
+
+    setTimeout(() => {
+      deckStage.style.minHeight = (sheetCurrent.offsetHeight + 20) + "px";
+    }, 40);
+
+    requestAnimationFrame(() => {
+      headlineEl.classList.add("inked");
+      document.querySelectorAll(".fade-in-element").forEach(el => el.classList.add("revealed"));
+      applyRubberStamp(s);
+    });
+  }
+
+  function applyRubberStamp(story) {
+    const isToday = story.rawDate && (story.rawDate === todayIso || story.rawDate.toLowerCase() === "today");
+    let stampMsg = "EXTRA!";
+    if (isToday) {
+      stampMsg = "HOT OFF THE PRESS";
+    } else if (story.category && story.category.toLowerCase().includes("read")) {
+      stampMsg = "WORTH A READ";
+    }
+
+    stampText.textContent = stampMsg;
+    setTimeout(() => {
+      rubberStamp.style.display = "inline-block";
+      rubberStamp.classList.add("stamped");
+    }, 90);
+  }
+</script>
+<div style="position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:50;font:12px/1.4 Georgia,serif;background:#1c1b19;color:#faf6ec;padding:6px 12px;border-radius:3px;opacity:.85">Demo edition: a saved briefing of real articles. <a style="color:#faf6ec" href="https://github.com/manya-5/loopy#run-it-locally">Run it locally</a> for live news.</div>
+</body>
+</html>
